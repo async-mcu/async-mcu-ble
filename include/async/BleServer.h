@@ -15,15 +15,15 @@ namespace async {
         Setting<int> * setting;
         NimBLECharacteristic* characteristic;
 
-        void onRead(NimBLECharacteristic* pCharacteristic){
-            Serial.print(pCharacteristic->getUUID().toString().c_str());
-            Serial.print(": onRead(), value: ");
-            Serial.println(pCharacteristic->getValue().c_str());
-        };
+        // void onRead(NimBLECharacteristic* pCharacteristic){
+        //     Serial.print(pCharacteristic->getUUID().toString().c_str());
+        //     Serial.print(": onRead(), value: ");
+        //     Serial.println(pCharacteristic->getValue().c_str());
+        // };
 
         void onWrite(NimBLECharacteristic* pCharacteristic, NimBLEConnInfo& connInfo) override {
-            Serial.print(pCharacteristic->getUUID().toString().c_str());
-            Serial.print(": onWrite(), value: ");
+            //Serial.print(pCharacteristic->getUUID().toString().c_str());
+            //Serial.print(": onWrite(), value: ");
             setting->set(atoi(pCharacteristic->getValue().c_str()));
         }
 
@@ -101,22 +101,22 @@ namespace async {
             NimBLEAdvertising * pAdvertising;
            // VoidCallback onConnect;
 
-            void onConnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo) override {
-                Serial.printf("Client address: %s\n", connInfo.getAddress().toString().c_str());
+            // void onConnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo) override {
+            //     Serial.printf("Client address: %s\n", connInfo.getAddress().toString().c_str());
 
-                /**
-                 *  We can use the connection handle here to ask for different connection parameters.
-                 *  Args: connection handle, min connection interval, max connection interval
-                 *  latency, supervision timeout.
-                 *  Units; Min/Max Intervals: 1.25 millisecond increments.
-                 *  Latency: number of intervals allowed to skip.
-                 *  Timeout: 10 millisecond increments.
-                 */
-                pServer->updateConnParams(connInfo.getConnHandle(), 24, 48, 0, 180);
-            }
+            //     /**
+            //      *  We can use the connection handle here to ask for different connection parameters.
+            //      *  Args: connection handle, min connection interval, max connection interval
+            //      *  latency, supervision timeout.
+            //      *  Units; Min/Max Intervals: 1.25 millisecond increments.
+            //      *  Latency: number of intervals allowed to skip.
+            //      *  Timeout: 10 millisecond increments.
+            //      */
+            //     pServer->updateConnParams(connInfo.getConnHandle(), 24, 48, 0, 180);
+            // }
 
             void onDisconnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo, int reason) override {
-                Serial.printf("Client disconnected - start advertising\n");
+                //Serial.printf("Client disconnected - start advertising\n");
                 NimBLEDevice::startAdvertising();
             }
 
