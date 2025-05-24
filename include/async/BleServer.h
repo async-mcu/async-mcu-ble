@@ -92,37 +92,47 @@ namespace async {
         }
     };
 
-
     class BleServer : public Tick, NimBLEServerCallbacks  {
+        typedef Function<void(NimBLEServer* pServer, NimBLEConnInfo& connInfo)> OnBleConnectCallback;
+        typedef Function<void(NimBLEServer* pServer, NimBLEConnInfo& connInfo, int reason)> OnBleDisconnectCallback;
+
         private:
             const char * name;
             NimBLEServer * pServer;
             NimBLEService * pSettingService;
             NimBLEAdvertising * pAdvertising;
-           // VoidCallback onConnect;
+            OnBleConnectCallback connectCB;
+            OnBleDisconnectCallback disconncetCB;
 
-            // void onConnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo) override {
-            //     Serial.printf("Client address: %s\n", connInfo.getAddress().toString().c_str());
+            void onConnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo) override {
+                //Serial.printf("Client address: %s\n", connInfo.getAddress().toString().c_str());
 
-            //     /**
-            //      *  We can use the connection handle here to ask for different connection parameters.
-            //      *  Args: connection handle, min connection interval, max connection interval
-            //      *  latency, supervision timeout.
-            //      *  Units; Min/Max Intervals: 1.25 millisecond increments.
-            //      *  Latency: number of intervals allowed to skip.
-            //      *  Timeout: 10 millisecond increments.
-            //      */
-            //     pServer->updateConnParams(connInfo.getConnHandle(), 24, 48, 0, 180);
-            // }
+                if(connectCB) {
+                    connectCB(pServer, connInfo);
+                }
+
+                /**
+                 *  We can use the connection handle here to ask for different connection parameters.
+                 *  Args: connection handle, min connection interval, max connection interval
+                 *  latency, supervision timeout.
+                 *  Units; Min/Max Intervals: 1.25 millisecond increments.
+                 *  Latency: number of intervals allowed to skip.
+                 *  Timeout: 10 millisecond increments.
+                 */
+                //pServer->updateConnParams(connInfo.getConnHandle(), 24, 48, 0, 180);
+            }
 
             void onDisconnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo, int reason) override {
+                if(disconncetCB) {
+                    disconncetCB(pServer, connInfo, reason);   
+                }
                 //Serial.printf("Client disconnected - start advertising\n");
                 NimBLEDevice::startAdvertising();
             }
 
         public:
-            BleServer(const char * name) : name(name) {
-            }
+
+            BleServer(const char * name) : name(name) {}
 
             bool start() {
                 NimBLEDevice::init(name);
@@ -138,6 +148,14 @@ namespace async {
                 pAdvertising->start();
 
                 return true;
+            }
+
+            void onConnect(OnBleConnectCallback cb) {
+                this->connectCB = cb;
+            }
+
+            void onDisconnect(OnBleDisconnectCallback cb) {
+                this->disconncetCB = cb;
             }
 
             void addSetting(Setting<int> * setting) {

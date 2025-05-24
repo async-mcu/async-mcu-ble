@@ -26,6 +26,14 @@ void setup() {
   executor.add(&settingBool);
   executor.add(&settingString);
 
+  server.onConnect([](NimBLEServer* pServer, NimBLEConnInfo& connInfo) {
+    Serial.printf("Client address: %s\n", connInfo.getAddress().toString().c_str());
+  });
+
+  server.onDisconnect([](NimBLEServer* pServer, NimBLEConnInfo& connInfo, int reason) {
+    Serial.printf("Client disconnected - start advertising\n");
+  });
+
   info("settingInt  %d", settingInt.get());
   info("settingFloat  %f", settingFloat.get());
   info("settingDouble  %f", settingDouble.get());
