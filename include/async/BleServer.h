@@ -68,7 +68,7 @@ namespace async {
         NimBLECharacteristic* characteristic;
 
         void onWrite(NimBLECharacteristic* pCharacteristic, NimBLEConnInfo& connInfo) override {
-            setting->set(pCharacteristic->getValue().c_str() == "true");
+            setting->set(pCharacteristic->getValue() == "true");
         }
 
         public: CharacteristicCallbacks(Setting<bool> * setting, NimBLECharacteristic* characteristic): setting(setting), characteristic(characteristic) {}
