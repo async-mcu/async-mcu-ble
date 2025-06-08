@@ -103,6 +103,7 @@ namespace async {
             NimBLEAdvertising * pAdvertising;
             OnBleConnectCallback connectCB;
             OnBleDisconnectCallback disconncetCB;
+            Setting<String> * settingName;
 
             void onConnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo) override {
                 //Serial.printf("Client address: %s\n", connInfo.getAddress().toString().c_str());
@@ -131,11 +132,18 @@ namespace async {
             }
 
         public:
-
             BleServer(const char * name) : name(name) {}
+            BleServer(Setting<String> * name) {
+                settingName = name;
+            }
 
             bool start() {
-                NimBLEDevice::init(name);
+                if(settingName != nullptr) {
+                    NimBLEDevice::init(settingName->get().c_str());
+                }
+                else {
+                    NimBLEDevice::init(name);
+                }
 
                 pServer = NimBLEDevice::createServer();
                 pServer->setCallbacks(this);
